@@ -1,0 +1,28 @@
+{
+  "name": "research-browser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "electron-webpack dev"
+  },
+  "keywords": [],
+  "author": "Szymon Kaliski <hi@szymonkaliski.com> (http://szymonkaliski.com)",
+  "license": "MIT",
+  "electronWebpack": {
+    "title": "Research Browser",
+    "whiteListedModules": []
+  },
+  "devDependencies": {
+    "@babel/preset-react": "^7.10.1",
+    "css-loader": "^3.6.0",
+    "electron": "^9.0.4",
+    "electron-webpack": "^2.8.2",
+    "webpack": "^4.43.0"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "tachyons": "^4.12.0"
+  }
+}
