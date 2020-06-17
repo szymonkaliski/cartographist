@@ -36,6 +36,7 @@ const usePersistedState = (key, initialValue) => {
 };
 
 const Webview = ({ src, onNewWindow, onClose, onNavigate }) => {
+  const [title, setTitle] = useState("");
   const ref = useRef(null);
 
   useEffect(() => {
@@ -54,7 +55,11 @@ const Webview = ({ src, onNewWindow, onClose, onNavigate }) => {
     ref.current.addEventListener("did-navigate-in-page", (e) => {
       onNavigate(e.url);
     });
-  }, [ref]);
+
+    ref.current.addEventListener("page-title-updated", (e) => {
+      setTitle(e.title);
+    });
+  }, [ref, setTitle]);
 
   return (
     <div className="flex flex-column h-100">
@@ -62,8 +67,10 @@ const Webview = ({ src, onNewWindow, onClose, onNavigate }) => {
         className="pa2 sans-serif f6 light-gray flex items-center justify-between"
         style={{ width: 640 }}
       >
-        <div title={src} className="truncate">
-          {src}
+        <div title={src} className="truncate flex">
+          <div>{title}</div>
+          <div className="mh2 silver">&mdash;</div>
+          <div className="silver">{src}</div>
         </div>
 
         <button
@@ -85,6 +92,8 @@ const Webview = ({ src, onNewWindow, onClose, onNavigate }) => {
 const App = () => {
   const [urls, setUrls] = usePersistedState("urls", []);
 
+  console.log(urls);
+
   return (
     <div className="sans-serif bg-near-white vh-100 flex flex-column">
       <div
@@ -94,13 +103,13 @@ const App = () => {
         <div className="tc w-100">Research Browser</div>
       </div>
 
-      <div className="flex overflow-x-scroll h-100">
+      <div className="flex overflow-x-scroll h-100 mh2 mb2">
         {urls.map((url, i) => (
-          <div key={url} className="ba b--dark-gray bg-dark-gray ma1">
+          <div key={url} className="ba b--dark-gray bg-dark-gray">
             <Webview
               src={url}
               onNavigate={(url) => setUrls(replaceAt(urls, i, url))}
-              onNewWindow={(url) => setUrls(urls.slice(0, i + 1).concat([url]))}
+              onNewWindow={(url) => setUrls([...urls.slice(0, i + 1), [url]])}
               onClose={() => setUrls(urls.slice(0, i))}
             />
           </div>
