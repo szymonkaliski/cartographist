@@ -57,9 +57,9 @@ const Webview = ({ src, onNewWindow, onClose, onNavigate }) => {
   }, [ref]);
 
   return (
-    <div className="h-100">
+    <div className="flex flex-column h-100">
       <div
-        className="pa2 sans-serif f6 bg-light-gray gray flex items-center justify-between"
+        className="pa2 sans-serif f6 light-gray flex items-center justify-between"
         style={{ width: 640 }}
       >
         <div title={src} className="truncate">
@@ -67,7 +67,7 @@ const Webview = ({ src, onNewWindow, onClose, onNavigate }) => {
         </div>
 
         <button
-          className="bg-none bw0 pointer dim"
+          className="bg-dark-gray light-gray bw0 pointer dim"
           title="Close"
           onClick={onClose}
         >
@@ -75,7 +75,9 @@ const Webview = ({ src, onNewWindow, onClose, onNavigate }) => {
         </button>
       </div>
 
-      <webview ref={ref} src={src} style={{ width: 640, height: "100%" }} />
+      <div className="h-100">
+        <webview ref={ref} src={src} style={{ width: 640, height: "100%" }} />
+      </div>
     </div>
   );
 };
@@ -83,16 +85,8 @@ const Webview = ({ src, onNewWindow, onClose, onNavigate }) => {
 const App = () => {
   const [urls, setUrls] = usePersistedState("urls", []);
 
-  // useEffect(() => {
-  //   if (urls.length === 0) {
-  //     setUrls(["https://en.m.wikipedia.org/wiki/Double-loop_learning"]);
-  //   }
-  // }, [urls, setUrls]);
-
-  console.log("urls", urls);
-
   return (
-    <div className="sans-serif bg-near-white vh-100">
+    <div className="sans-serif bg-near-white vh-100 flex flex-column">
       <div
         className="flex items-center f6 gray"
         style={{ "-webkit-app-region": "drag", height: 38 }}
@@ -100,9 +94,9 @@ const App = () => {
         <div className="tc w-100">Research Browser</div>
       </div>
 
-      <div className="flex overflow-scroll h-100">
+      <div className="flex overflow-x-scroll h-100">
         {urls.map((url, i) => (
-          <div key={url} className="ba b--light-gray bg-dark-gray mh1">
+          <div key={url} className="ba b--dark-gray bg-dark-gray ma1">
             <Webview
               src={url}
               onNavigate={(url) => setUrls(replaceAt(urls, i, url))}
