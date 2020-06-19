@@ -21,6 +21,7 @@
     "webpack": "^4.43.0"
   },
   "dependencies": {
+    "immer": "^7.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "tachyons": "^4.12.0"
