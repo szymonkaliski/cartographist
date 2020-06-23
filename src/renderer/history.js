@@ -18,6 +18,21 @@ export const navigate = (history, item) => {
   });
 };
 
+export const jump = (history, path) => {
+  // reset all first
+  traverse(history, (node) => {
+    node.current = false;
+  });
+
+  // happy path coding...
+  // assuming first item in path "fits" already
+  let tmp = history;
+  path.slice(1).forEach((p) => {
+    tmp = tmp.children.find((h) => h.item === p);
+  });
+  tmp.current = true;
+};
+
 export const back = (history) => {
   callcc((exit) => {
     traverse(history, (node, parent) => {

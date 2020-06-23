@@ -6,15 +6,21 @@ const INJECT_PATH =
 
 const BROWSER_WIDTH = 640;
 
-const History = ({ history }) => {
+const History = ({ history, path = [], onClick }) => {
   return (
     <>
-      {history.item}
+      <button onClick={() => onClick([...path, history.item])}>
+        {history.item}
+      </button>
       <ol>
         {history.children.map((child) => {
           return (
             <li>
-              <History history={child} />
+              <History
+                history={child}
+                path={[...path, history.item]}
+                onClick={onClick}
+              />
             </li>
           );
         })}
@@ -31,6 +37,8 @@ export default ({
   canGoForward,
   onGoBack,
   onGoForward,
+
+  onNavigateHistory,
 
   onNewWindow,
   onClose,
@@ -140,7 +148,7 @@ export default ({
             className="absolute bg-dark-gray light-gray w-100 pa2 overflow-scroll"
             style={{ top: 0 }}
           >
-            <History history={history} />
+            <History history={history} onClick={onNavigateHistory} />
           </div>
         )}
 

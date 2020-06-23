@@ -25,8 +25,6 @@ const App = () => {
     },
   ]);
 
-  console.log(histories);
-
   return (
     <div className="sans-serif bg-near-white vh-100 flex flex-column">
       <div
@@ -72,6 +70,13 @@ const App = () => {
                       })
                     )
                   );
+                }}
+                onNavigateHistory={(path) => {
+                  const newHistory = produce(history, (draft) => {
+                    h.jump(draft, path);
+                  });
+
+                  setHistories(replaceAt(histories, i, newHistory));
                 }}
                 onNavigate={(newUrl) => {
                   if (url === newUrl) {
