@@ -25,6 +25,8 @@ const App = () => {
     },
   ]);
 
+  window.getStatus = () => ({ histories });
+
   return (
     <div className="sans-serif bg-near-white vh-100 flex flex-column">
       <div

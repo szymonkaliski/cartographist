@@ -1,33 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 
+import History from "./history-visualization";
+
 // TODO: make this dynamic
 const INJECT_PATH =
   "file:///Users/szymon/Documents/Projects/research-browser/src/renderer/inject.js";
 
 const BROWSER_WIDTH = 640;
-
-const History = ({ history, path = [], onClick }) => {
-  return (
-    <>
-      <button onClick={() => onClick([...path, history.item])}>
-        {history.item}
-      </button>
-      <ol>
-        {history.children.map((child) => {
-          return (
-            <li>
-              <History
-                history={child}
-                path={[...path, history.item]}
-                onClick={onClick}
-              />
-            </li>
-          );
-        })}
-      </ol>
-    </>
-  );
-};
 
 export default ({
   src,

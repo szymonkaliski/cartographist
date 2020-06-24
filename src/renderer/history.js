@@ -8,6 +8,7 @@ export const navigate = (history, item) => {
         node.current = false;
         node.children.push({
           item,
+          timestamp: Date.now(),
           current: true,
           children: [],
         });
@@ -31,6 +32,7 @@ export const jump = (history, path) => {
     tmp = tmp.children.find((h) => h.item === p);
   });
   tmp.current = true;
+  tmp.timestamp = Date.now()
 };
 
 export const back = (history) => {
