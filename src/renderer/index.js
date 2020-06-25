@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { last } from "lodash";
-import produce from "immer";
 
 import "tachyons/src/tachyons.css";
 import "./inject"; // so we reload when inject changes
@@ -19,7 +18,8 @@ const replaceAt = (array, index, value) => {
 const App = () => {
   const [histories, setHistories] = usePersistedState("history", [
     {
-      item: "https://en.m.wikipedia.org/wiki/Double-loop_learning",
+      url: "https://en.m.wikipedia.org/wiki/Double-loop_learning",
+      title: "",
       current: true,
       children: [],
     },
@@ -40,56 +40,48 @@ const App = () => {
         {histories.map((history, i) => {
           const current = h.current(history);
 
-          const url = current.item;
+          const { url, title } = current.node;
           const canGoBack = !!current.parent;
-          const canGoForward = current.children.length > 0;
+          const canGoForward = current.node.children.length > 0;
 
           return (
             <div key={i + "-" + url} className="ba b--dark-gray bg-dark-gray">
               <Webview
                 src={url}
+                title={title}
                 history={history}
                 canGoBack={canGoBack}
                 canGoForward={canGoForward}
+                onSetTitle={(newTitle) => {
+                  setHistories((draft) => {
+                    h.processCurrent(draft[i], (node) => {
+                      node.title = newTitle;
+                    });
+                  });
+                }}
                 onGoBack={() => {
-                  setHistories(
-                    replaceAt(
-                      histories,
-                      i,
-                      produce(history, (draft) => {
-                        h.back(draft);
-                      })
-                    )
-                  );
+                  setHistories((draft) => {
+                    h.back(draft[i]);
+                  });
                 }}
                 onGoForward={() => {
-                  setHistories(
-                    replaceAt(
-                      histories,
-                      i,
-                      produce(history, (draft) => {
-                        h.forward(draft);
-                      })
-                    )
-                  );
+                  setHistories((draft) => {
+                    h.forward(draft[i]);
+                  });
                 }}
                 onNavigateHistory={(path) => {
-                  const newHistory = produce(history, (draft) => {
-                    h.jump(draft, path);
+                  setHistories((draft) => {
+                    h.jump(draft[i], path);
                   });
-
-                  setHistories(replaceAt(histories, i, newHistory));
                 }}
                 onNavigate={(newUrl) => {
                   if (url === newUrl) {
                     return;
                   }
 
-                  const newHistory = produce(history, (draft) => {
-                    h.navigate(draft, newUrl);
+                  setHistories((draft) => {
+                    h.navigate(draft[i], newUrl);
                   });
-
-                  setHistories(replaceAt(histories, i, newHistory));
                 }}
                 onNewWindow={(url) => {
                   // TODO

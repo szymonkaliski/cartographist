@@ -1,13 +1,15 @@
 import { last } from "lodash";
 import { callcc, traverse } from "./utils";
 
-export const navigate = (history, item) => {
+export const navigate = (history, url) => {
   callcc((exit) => {
     traverse(history, (node) => {
       if (node.current) {
         node.current = false;
+
         node.children.push({
-          item,
+          url,
+          title: "",
           timestamp: Date.now(),
           current: true,
           children: [],
@@ -28,11 +30,16 @@ export const jump = (history, path) => {
   // happy path coding...
   // assuming first item in path "fits" already
   let tmp = history;
+
   path.slice(1).forEach((p) => {
-    tmp = tmp.children.find((h) => h.item === p);
+    tmp = tmp.children.find((h) => h.url === p);
   });
-  tmp.current = true;
-  tmp.timestamp = Date.now()
+
+  if (tmp) {
+    tmp.current = true;
+  } else {
+    throw new Error(`item not found for path: ${path}`);
+  }
 };
 
 export const back = (history) => {
@@ -69,7 +76,18 @@ export const current = (history) => {
   return callcc((exit) => {
     traverse(history, (node, parent) => {
       if (node.current) {
-        exit({ ...node, parent });
+        exit({ node, parent });
+      }
+    });
+  });
+};
+
+export const processCurrent = (history, callback) => {
+  callcc((exit) => {
+    traverse(history, (node, parent) => {
+      if (node.current) {
+        callback(node, parent);
+        exit();
       }
     });
   });

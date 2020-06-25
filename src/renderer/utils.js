@@ -1,6 +1,16 @@
-export const traverse = (tree, callback, parent) => {
+const traverseInternal = (tree, callback, parent, accessor) => {
   callback(tree, parent);
-  tree.children.forEach((node) => traverse(node, callback, tree));
+  accessor(tree).forEach((node) =>
+    traverseInternal(node, callback, tree, accessor)
+  );
+};
+
+export const traverse = (
+  tree,
+  callback,
+  accessor = (node) => node.children
+) => {
+  return traverseInternal(tree, callback, undefined, accessor);
 };
 
 class Exit extends Error {

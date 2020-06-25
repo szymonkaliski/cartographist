@@ -11,6 +11,7 @@ const BROWSER_WIDTH = 640;
 export default ({
   src,
   history,
+  title,
 
   canGoBack,
   canGoForward,
@@ -19,11 +20,11 @@ export default ({
 
   onNavigateHistory,
 
+  onSetTitle,
   onNewWindow,
   onClose,
   onNavigate,
 }) => {
-  const [title, setTitle] = useState("");
   const [hoverUrl, setHoverUrl] = useState(null);
   const [isHistoryVisible, setIsHistoryVisible] = useState(true);
 
@@ -51,7 +52,7 @@ export default ({
     });
 
     ref.current.addEventListener("page-title-updated", (e) => {
-      setTitle(e.title);
+      onSetTitle(e.title);
     });
 
     ref.current.addEventListener("ipc-message", (e) => {
@@ -65,7 +66,7 @@ export default ({
         setHoverUrl(null);
       }
     });
-  }, [ref, setTitle]);
+  }, [ref]);
 
   const canShowHistory = canGoForward || canGoBack;
 
