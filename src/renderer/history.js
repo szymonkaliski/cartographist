@@ -5,15 +5,27 @@ export const navigate = (history, url) => {
   callcc((exit) => {
     traverse(history, (node) => {
       if (node.current) {
-        node.current = false;
+        // don't do anything if we're navigating to where we are
+        if (node.url === url) {
+          exit();
+        }
 
-        node.children.push({
-          url,
-          title: "",
-          timestamp: Date.now(),
-          current: true,
-          children: [],
-        });
+        node.current = false;
+        const existingChild = node.children.find((n) => n.url === url);
+
+        if (existingChild) {
+          // if we were in this url before, just go there again
+          existingChild.current = true;
+        } else {
+          // otherwise - create new child
+          node.children.push({
+            url,
+            title: "",
+            timestamp: Date.now(),
+            current: true,
+            children: [],
+          });
+        }
 
         exit();
       }
@@ -44,8 +56,10 @@ export const jump = (history, path) => {
 
 export const back = (history) => {
   callcc((exit) => {
-    traverse(history, (node, parent) => {
+    traverse(history, (node, parents) => {
       if (node.current) {
+        const parent = last(parents);
+
         if (parent !== undefined) {
           node.current = false;
           parent.current = true;
@@ -59,7 +73,7 @@ export const back = (history) => {
 
 export const forward = (history) => {
   callcc((exit) => {
-    traverse(history, (node, parent) => {
+    traverse(history, (node) => {
       if (node.current) {
         if (node.children.length > 0) {
           node.current = false;
@@ -72,11 +86,11 @@ export const forward = (history) => {
   });
 };
 
-export const current = (history) => {
+export const getCurrent = (history) => {
   return callcc((exit) => {
-    traverse(history, (node, parent) => {
+    traverse(history, (node, parents) => {
       if (node.current) {
-        exit({ node, parent });
+        exit({ node, parents });
       }
     });
   });
@@ -84,9 +98,9 @@ export const current = (history) => {
 
 export const processCurrent = (history, callback) => {
   callcc((exit) => {
-    traverse(history, (node, parent) => {
+    traverse(history, (node, parents) => {
       if (node.current) {
-        callback(node, parent);
+        callback(node, parents);
         exit();
       }
     });

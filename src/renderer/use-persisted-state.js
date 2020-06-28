@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { useImmer } from "use-immer";
+import { useState, useEffect, useCallback } from "react";
+import produce from "immer";
 
 export default function usePersistedState(key, initialValue) {
-  const [value, setValue] = useImmer(initialValue);
+  const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
     if (value === initialValue) {
@@ -16,17 +16,13 @@ export default function usePersistedState(key, initialValue) {
         } catch (e) {}
 
         if (storedValue) {
-          setValue((draft) => {
-            for (let key in storedValue) {
-              draft[key] = storedValue[key];
-            }
-          });
+          setValue(storedValue);
         }
       }
     } else {
       localStorage[key] = JSON.stringify(value);
     }
-  }, [value]);
+  }, [value, setValue]);
 
-  return [value, setValue];
+  return [value, useCallback((updater) => setValue(produce(updater)))];
 }

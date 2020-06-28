@@ -9,12 +9,6 @@ import * as h from "./history";
 import Webview from "./webview";
 import usePersistedState from "./use-persisted-state";
 
-const replaceAt = (array, index, value) => {
-  const ret = array.slice(0);
-  ret[index] = value;
-  return ret;
-};
-
 const App = () => {
   const [histories, setHistories] = usePersistedState("history", [
     {
@@ -22,10 +16,11 @@ const App = () => {
       title: "",
       current: true,
       children: [],
+      timestamp: Date.now(),
     },
   ]);
 
-  window.getStatus = () => ({ histories });
+  window.state = { histories };
 
   return (
     <div className="sans-serif bg-near-white vh-100 flex flex-column">
@@ -38,10 +33,10 @@ const App = () => {
 
       <div className="flex overflow-x-scroll h-100 mh2 mb2">
         {histories.map((history, i) => {
-          const current = h.current(history);
+          const current = h.getCurrent(history);
 
           const { url, title } = current.node;
-          const canGoBack = !!current.parent;
+          const canGoBack = current.parents.length > 0;
           const canGoForward = current.node.children.length > 0;
 
           return (
@@ -75,10 +70,6 @@ const App = () => {
                   });
                 }}
                 onNavigate={(newUrl) => {
-                  if (url === newUrl) {
-                    return;
-                  }
-
                   setHistories((draft) => {
                     h.navigate(draft[i], newUrl);
                   });
