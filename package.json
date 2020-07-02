@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "electron-webpack dev"
+    "dev": "electron-webpack dev",
+    "lint": "eslint src/"
   },
   "keywords": [],
   "author": "Szymon Kaliski <hi@szymonkaliski.com> (http://szymonkaliski.com)",
@@ -15,13 +16,19 @@
   },
   "devDependencies": {
     "@babel/preset-react": "^7.10.1",
+    "babel-eslint": "^10.1.0",
     "css-loader": "^3.6.0",
     "electron": "^9.0.5",
     "electron-webpack": "^2.8.2",
+    "eslint": "^7.3.1",
+    "eslint-config-node-style-guide": "^3.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-react-hooks": "^4.0.5",
     "webpack": "^4.43.0"
   },
   "dependencies": {
-    "d3": "^5.16.0",
     "immer": "^7.0.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

@@ -26,7 +26,7 @@ export default ({
   onNavigate,
 }) => {
   const [hoverUrl, setHoverUrl] = useState(null);
-  const [isHistoryVisible, setIsHistoryVisible] = useState(true);
+  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
 
   const ref = useRef(null);
 

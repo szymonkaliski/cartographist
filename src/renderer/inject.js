@@ -8,6 +8,6 @@ document.addEventListener("mouseover", (e) => {
   ipcRenderer.sendToHost("on-mouseover", e.target.href);
 });
 
-document.addEventListener("mouseout", (e) => {
+document.addEventListener("mouseout", () => {
   ipcRenderer.sendToHost("on-mouseout");
 });

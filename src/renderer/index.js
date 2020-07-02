@@ -11,13 +11,7 @@ import usePersistedState from "./use-persisted-state";
 
 const App = () => {
   const [histories, setHistories] = usePersistedState("history", [
-    {
-      url: "https://en.m.wikipedia.org/wiki/Double-loop_learning",
-      title: "",
-      current: true,
-      children: [],
-      timestamp: Date.now(),
-    },
+    h.create("https://en.m.wikipedia.org/wiki/Double-loop_learning"),
   ]);
 
   window.state = { histories };
@@ -75,7 +69,9 @@ const App = () => {
                   });
                 }}
                 onNewWindow={(url) => {
-                  // TODO
+                  setHistories((draft) => {
+                    draft.push(h.create(url));
+                  });
                 }}
                 onClose={() => {
                   // TODO

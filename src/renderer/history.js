@@ -106,3 +106,13 @@ export const processCurrent = (history, callback) => {
     });
   });
 };
+
+export const create = url => {
+  return {
+    url,
+    title: '',
+    current: true,
+    children: [],
+    timestamp: Date.now()
+  }
+}

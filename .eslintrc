@@ -1,0 +1,23 @@
+{
+  "extends": ["node-style-guide", "prettier"],
+  "plugins": ["react", "react-hooks", "prettier"],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2018,
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "max-statements": [0],
+    "react/jsx-uses-vars": [1],
+    "react/jsx-uses-react": [1]
+  },
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true,
+    "worker": true
+  }
+}

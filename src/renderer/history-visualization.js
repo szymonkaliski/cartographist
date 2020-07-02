@@ -1,25 +1,7 @@
 import React from "react";
-import * as d3 from "d3";
 import { sortBy, findLastIndex, last, chain } from "lodash";
 
 import { traverse } from "./utils";
-
-// const createLink = d3
-//   .linkVertical()
-//   .x((d) => d.x)
-//   .y((d) => d.y);
-
-const pathForNode = (node) => {
-  let path = [];
-
-  traverse(
-    node,
-    (node) => node && path.push(node.data.url),
-    (node) => (node ? [node.parent] : [])
-  );
-
-  return path.reverse();
-};
 
 export default ({ history, onClick }) => {
   console.log("history", history);
@@ -58,32 +40,6 @@ export default ({ history, onClick }) => {
 
   console.log("branches", branches);
 
-  // let runningOffset = 0
-  // const itemsWithBranchesOld = items.map((item) => {
-  //   const matching = item.parents.filter((p) => {
-  //     return splitPoints.find((url) => p.url === url);
-  //   });
-
-  //   console.log(item.data.url, "matching", matching, item);
-
-  //   let offset = 0;
-  //   matching.forEach((m) => {
-  //     let found = false;
-  //     m.children.forEach((childTree, i) => {
-  //       if (!found) {
-  //         traverse(childTree, (node) => {
-  //           if (!found && node.url === item.data.url) {
-  //             found = true;
-  //             offset += i;
-  //           }
-  //         });
-  //       }
-  //     });
-  //   });
-
-  //   return { ...item, offset };
-  // });
-
   const itemsWithBranches = items.map((item) => {
     const matching = [...item.parents, item.data].map((p) => {
       return branches.findIndex((url) => p.url === url);
@@ -94,26 +50,6 @@ export default ({ history, onClick }) => {
     console.log(item.data.url, "matching", matching, self);
 
     let offset = Math.max(0, Math.max(...matching) + 1);
-    // if (self > 0) {
-    //   offset = self;
-    // }
-
-    // let offset = Math.max(0, matching.find(m => m > 0) || 0);
-
-    // let offset = 0;
-    // matching.forEach((m) => {
-    //   let found = false;
-    //   m.children.forEach((childTree, i) => {
-    //     if (!found) {
-    //       traverse(childTree, (node) => {
-    //         if (!found && node.url === item.data.url) {
-    //           found = true;
-    //           offset += i;
-    //         }
-    //       });
-    //     }
-    //   });
-    // });
 
     return { ...item, offset };
   });
@@ -127,45 +63,6 @@ export default ({ history, onClick }) => {
   });
 
   console.log("itemsOnGrid", itemsOnGrid);
-
-  // itemsWithBranches.forEach(item => {
-  //   console.log(item.offset, item.data.url)
-  // })
-
-  // console.log("splitPoints", splitPoints);
-  // console.log("itemsWithBranches", itemsWithBranches);
-
-  // for (let item of items) {
-  //   if (item.data.children.length > 1) {
-  //     // splitPoints.push(item.data.url)
-  //   }
-
-  //   const path = pathForNode(item)
-
-  //   console.log({ splitPoints, path, item})
-
-  //   // console.log(item.title, '\t', item.children.length)
-  // }
-
-  // console.log("items", items);
-
-  // ---
-
-  // const root = d3.hierarchy(history);
-  // // .sort((a, b) => a.data.timestamp - b.data.timestamp);
-
-  // const tree = d3.tree().nodeSize([10, 100])(root);
-
-  // const descendants = tree.descendants();
-  // descendants.forEach((d, i) => {
-  //   d.y = i * 20;
-  // });
-
-  // const links = tree.links().map(createLink);
-
-  // console.log({ descendants, links });
-
-  // ---
 
   const offsets = Array.from(new Set(itemsOnGrid.map((i) => i.offset))).map(
     (offset) => {
@@ -184,8 +81,6 @@ export default ({ history, onClick }) => {
         const parent = itemsOnGrid.find((item) => item.data.url === url);
         start = parent.gy;
       }
-
-      // console.log({ offset, startItem });
 
       // const start = startItem.idx;
       const end = findLastIndex(itemsOnGrid, (i) => i.offset === offset);
