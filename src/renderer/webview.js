@@ -4,12 +4,12 @@ import path from "path";
 import History from "./history-visualization";
 
 const INJECT_PATH = path.join(process.cwd(), __dirname, "inject.js");
-const PANE_WIDTH = 640;
 
 export default ({
   src,
   history,
   title,
+  width,
 
   canGoBack,
   canGoForward,
@@ -22,6 +22,7 @@ export default ({
   onNewWindow,
   onClose,
   onNavigate,
+  onFullscreen
 }) => {
   const [hoverUrl, setHoverUrl] = useState(null);
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
@@ -69,7 +70,7 @@ export default ({
   const canShowHistory = canGoForward || canGoBack;
 
   return (
-    <div className="flex flex-column h-100" style={{ width: PANE_WIDTH }}>
+    <div className="flex flex-column h-100" style={{ width }}>
       <div className="pa2 sans-serif f6 light-gray flex items-center justify-between">
         <div className="flex truncate">
           <button
@@ -111,13 +112,23 @@ export default ({
           </div>
         </div>
 
-        <button
-          className="bg-dark-gray light-gray bw0 pointer dim"
-          title="Close"
-          onClick={onClose}
-        >
-          ✕
-        </button>
+        <div className="flex">
+          <button
+            className="bg-dark-gray light-gray bw0 pointer dim"
+            title="Fullscreen"
+            onClick={onFullscreen}
+          >
+            ⤢
+          </button>
+
+          <button
+            className="bg-dark-gray light-gray bw0 pointer dim"
+            title="Close"
+            onClick={onClose}
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div className="h-100 relative">
@@ -133,14 +144,14 @@ export default ({
         <webview
           ref={ref}
           src={src}
-          style={{ width: PANE_WIDTH, height: "100%" }}
+          style={{ width, height: "100%" }}
           preload={`file://${INJECT_PATH}`}
         />
 
         {hoverUrl && (
           <div
             className="absolute bg-dark-gray f7 light-gray pa1 truncate"
-            style={{ bottom: 0, maxWidth: PANE_WIDTH }}
+            style={{ bottom: 0, maxWidth: width }}
           >
             {hoverUrl}
           </div>

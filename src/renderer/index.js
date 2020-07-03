@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
 import "tachyons/src/tachyons.css";
@@ -8,12 +8,15 @@ import * as h from "./history";
 import Webview from "./webview";
 import usePersistedState from "./use-persisted-state";
 
+const PANE_WIDTH = 640;
+
 const INITIAL_STATE = [
   h.create("https://en.m.wikipedia.org/wiki/Double-loop_learning"),
 ];
 
 const App = () => {
   const [histories, setHistories] = usePersistedState("history", INITIAL_STATE);
+  const [fullscreenIdx, setFullscreenIdx] = useState(null);
 
   window.state = { histories };
 
@@ -26,7 +29,7 @@ const App = () => {
         <div className="tc w-100">Research Browser</div>
       </div>
 
-      <div className="flex overflow-x-scroll h-100 mh2 mb2">
+      <div className="flex overflow-x-scroll h-100">
         {histories.map((history, i) => {
           const current = h.getCurrent(history);
 
@@ -34,12 +37,20 @@ const App = () => {
           const canGoBack = current.parents.length > 0;
           const canGoForward = current.node.children.length > 0;
 
+          const isFullscreen = i === fullscreenIdx;
+          const width = isFullscreen ? "100%" : PANE_WIDTH; // TODO: width in px?
+
+          const className = `ba b--dark-gray bg-dark-gray ${
+            isFullscreen && "absolute w-100 h-100 z-5"
+          }`;
+
           return (
-            <div key={i + "-" + url} className="ba b--dark-gray bg-dark-gray">
+            <div key={i + "-" + url} className={className}>
               <Webview
                 src={url}
                 title={title}
                 history={history}
+                width={width}
                 canGoBack={canGoBack}
                 canGoForward={canGoForward}
                 onSetTitle={(newTitle) => {
@@ -84,6 +95,9 @@ const App = () => {
                       });
                     }
                   });
+                }}
+                onFullscreen={() => {
+                  setFullscreenIdx(fullscreenIdx === null ? i : null);
                 }}
               />
             </div>
