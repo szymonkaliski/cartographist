@@ -1,12 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
+import path from "path";
 
 import History from "./history-visualization";
 
-// TODO: make this dynamic
-const INJECT_PATH =
-  "file:///Users/szymon/Documents/Projects/research-browser/src/renderer/inject.js";
-
-const BROWSER_WIDTH = 640;
+const INJECT_PATH = path.join(process.cwd(), __dirname, "inject.js");
+const PANE_WIDTH = 640;
 
 export default ({
   src,
@@ -26,7 +24,7 @@ export default ({
   onNavigate,
 }) => {
   const [hoverUrl, setHoverUrl] = useState(null);
-  const [isHistoryVisible, setIsHistoryVisible] = useState(true);
+  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
 
   const ref = useRef(null);
 
@@ -71,7 +69,7 @@ export default ({
   const canShowHistory = canGoForward || canGoBack;
 
   return (
-    <div className="flex flex-column h-100" style={{ width: BROWSER_WIDTH }}>
+    <div className="flex flex-column h-100" style={{ width: PANE_WIDTH }}>
       <div className="pa2 sans-serif f6 light-gray flex items-center justify-between">
         <div className="flex truncate">
           <button
@@ -135,14 +133,14 @@ export default ({
         <webview
           ref={ref}
           src={src}
-          style={{ width: BROWSER_WIDTH, height: "100%" }}
-          preload={INJECT_PATH}
+          style={{ width: PANE_WIDTH, height: "100%" }}
+          preload={`file://${INJECT_PATH}`}
         />
 
         {hoverUrl && (
           <div
             className="absolute bg-dark-gray f7 light-gray pa1 truncate"
-            style={{ bottom: 0, maxWidth: BROWSER_WIDTH }}
+            style={{ bottom: 0, maxWidth: PANE_WIDTH }}
           >
             {hoverUrl}
           </div>

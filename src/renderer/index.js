@@ -1,6 +1,5 @@
-import React, { useRef, useEffect, useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import { last } from "lodash";
 
 import "tachyons/src/tachyons.css";
 import "./inject"; // so we reload when inject changes
@@ -9,10 +8,12 @@ import * as h from "./history";
 import Webview from "./webview";
 import usePersistedState from "./use-persisted-state";
 
+const INITIAL_STATE = [
+  h.create("https://en.m.wikipedia.org/wiki/Double-loop_learning"),
+];
+
 const App = () => {
-  const [histories, setHistories] = usePersistedState("history", [
-    h.create("https://en.m.wikipedia.org/wiki/Double-loop_learning"),
-  ]);
+  const [histories, setHistories] = usePersistedState("history", INITIAL_STATE);
 
   window.state = { histories };
 
@@ -74,7 +75,15 @@ const App = () => {
                   });
                 }}
                 onClose={() => {
-                  // TODO
+                  setHistories((draft) => {
+                    draft.splice(i, 1);
+
+                    if (draft.length === 0) {
+                      INITIAL_STATE.forEach((initialValue, i) => {
+                        draft[i] = initialValue;
+                      });
+                    }
+                  });
                 }}
               />
             </div>

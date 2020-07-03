@@ -1,10 +1,12 @@
 import React, { useMemo } from "react";
-import { sortBy, findLastIndex, last, chain } from "lodash";
+import { sortBy, findLastIndex, last, chain, identity } from "lodash";
 
 import { traverse } from "./utils";
 
+const [W, H] = [16, 16];
+
 export default ({ history, onClick }) => {
-  const { items, offsets } = useMemo(() => {
+  const { items, verticalLines, horizontalLines } = useMemo(() => {
     let items = [];
 
     traverse(history, (node, parents) => {
@@ -37,8 +39,8 @@ export default ({ history, onClick }) => {
       return { ...item, gx, gy };
     });
 
-    const offsets = Array.from(new Set(items.map((item) => item.gx))).map(
-      (offset) => {
+    const verticalLines = Array.from(new Set(items.map((item) => item.gx)))
+      .map((offset) => {
         const startItem = items
           .map((item, idx) => ({ item, idx }))
           .find(({ item }) => item.gx === offset);
@@ -55,28 +57,59 @@ export default ({ history, onClick }) => {
         const end = findLastIndex(items, (item) => item.gx === offset);
 
         return { offset, start, end };
-      }
-    );
+      })
+      .filter((d) => d.start !== d.end);
 
-    return { items, offsets };
+    const horizontalLines = items
+      .map((item) => {
+        const { gy, gx } = item;
+
+        const matches = verticalLines.filter((line) => line.start === gy);
+
+        if (matches.length === 0) {
+          return null;
+        }
+
+        return {
+          offset: gy,
+          start: gx,
+          end: Math.max(...matches.map((m) => m.offset)),
+        };
+      })
+      .filter(identity)
+      .filter((d) => d.start !== d.end);
+
+    return { items, verticalLines, horizontalLines };
   }, [history]);
 
+  const maxX = Math.max(verticalLines.length, 1);
+  const maxY = items.length;
+
   return (
-    <div>
-      <svg width={600} height={300}>
-        <g transform="translate(6, 6)">
-          {offsets.map(({ start, end, offset }, i) => {
-            return (
-              <line
-                key={i}
-                x1={offset * 14}
-                y1={start * 16}
-                x2={offset * 14}
-                y2={end * 16}
-                stroke="#777"
-              />
-            );
-          })}
+    <div className="scroll" style={{ maxHeight: 260 }}>
+      <svg width={600} height={maxY * H} className="pa2">
+        <g transform="translate(2, 6)">
+          {verticalLines.map(({ start, end, offset }, i) => (
+            <line
+              key={i}
+              x1={offset * W}
+              y1={start * H}
+              x2={offset * W}
+              y2={end * H}
+              stroke="#777"
+            />
+          ))}
+
+          {horizontalLines.map(({ start, end, offset }, i) => (
+            <line
+              key={i}
+              x1={start * W}
+              y1={offset * H}
+              x2={end * W}
+              y2={offset * H}
+              stroke="#777"
+            />
+          ))}
 
           {items.map((item, i) => {
             const { data, gx, gy } = item;
@@ -86,7 +119,7 @@ export default ({ history, onClick }) => {
               <g
                 key={i}
                 className="dim pointer"
-                transform={`translate(0, ${gy * 16})`}
+                transform={`translate(0, ${gy * W})`}
                 onClick={() => {
                   const path = item.parents
                     .map((p) => p.url)
@@ -95,9 +128,8 @@ export default ({ history, onClick }) => {
                   onClick(path);
                 }}
               >
-                <circle cx={gx * 14} cy={0} r={2} fill={fill} />
-
-                <text x={100} y={5} fill={fill} fontSize={14}>
+                <circle cx={gx * W} cy={0} r={2} fill={fill} />
+                <text x={maxX * W} y={5} fill={fill} fontSize={14}>
                   {data.title || data.url}
                 </text>
               </g>
