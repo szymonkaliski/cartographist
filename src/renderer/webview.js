@@ -22,7 +22,7 @@ export default ({
   onNewWindow,
   onClose,
   onNavigate,
-  onFullscreen
+  onFullscreen,
 }) => {
   const [hoverUrl, setHoverUrl] = useState(null);
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
@@ -150,7 +150,7 @@ export default ({
 
         {hoverUrl && (
           <div
-            className="absolute bg-dark-gray f7 light-gray pa1 truncate"
+            className="absolute bg-dark-gray f7 light-gray pa1 truncate z-5"
             style={{ bottom: 0, maxWidth: width }}
           >
             {hoverUrl}

@@ -29,7 +29,10 @@ const App = () => {
         <div className="tc w-100">Research Browser</div>
       </div>
 
-      <div className="flex overflow-x-scroll h-100">
+      <div
+        className="flex overflow-x-scroll"
+        style={{ height: "calc(100% - 38px)" }}
+      >
         {histories.map((history, i) => {
           const current = h.getCurrent(history);
 
@@ -41,11 +44,15 @@ const App = () => {
           const width = isFullscreen ? "100%" : PANE_WIDTH; // TODO: width in px?
 
           const className = `ba b--dark-gray bg-dark-gray ${
-            isFullscreen && "absolute w-100 h-100 z-5"
+            isFullscreen && "absolute w-100 z-3"
           }`;
 
+          const style = isFullscreen
+            ? { height: "calc(100% - 38px)" }
+            : { height: "100%" };
+
           return (
-            <div key={i + "-" + url} className={className}>
+            <div key={i + "-" + url} className={className} style={style}>
               <Webview
                 src={url}
                 title={title}
