@@ -1,68 +1,55 @@
 import { last } from "lodash";
 import { callcc, traverse } from "./utils";
 
-export const navigate = (history, url) => {
+export const create = (url) => {
+  return {
+    url,
+    title: "",
+    children: [],
+    timestamp: Date.now(),
+  };
+};
+
+export const navigate = (history, fromUrl, toUrl) => {
+  if (fromUrl === toUrl) {
+    return;
+  }
+
+  const alreadyExists = callcc((exit) => {
+    traverse(history, (node) => {
+      if (node.url === toUrl) {
+        exit(true);
+      }
+    });
+  });
+
+  if (alreadyExists) {
+    return;
+  }
+
   callcc((exit) => {
     traverse(history, (node) => {
-      if (node.current) {
-        // don't do anything if we're navigating to where we are
-        if (node.url === url) {
+      if (node.url === fromUrl) {
+        const existingChild = node.children.find((n) => n.url === toUrl);
+
+        if (existingChild) {
           exit();
         }
 
-        node.current = false;
-        const existingChild = node.children.find((n) => n.url === url);
-
-        if (existingChild) {
-          // if we were in this url before, just go there again
-          existingChild.current = true;
-        } else {
-          // otherwise - create new child
-          node.children.push({
-            url,
-            title: "",
-            timestamp: Date.now(),
-            current: true,
-            children: [],
-          });
-        }
-
-        exit();
+        node.children.push(create(toUrl));
       }
     });
   });
 };
 
-export const jump = (history, path) => {
-  // reset all first
-  traverse(history, (node) => {
-    node.current = false;
-  });
-
-  // happy path coding...
-  // assuming first item in path "fits" already
-  let tmp = history;
-
-  path.slice(1).forEach((p) => {
-    tmp = tmp.children.find((h) => h.url === p);
-  });
-
-  if (tmp) {
-    tmp.current = true;
-  } else {
-    throw new Error(`item not found for path: ${path}`);
-  }
-};
-
-export const back = (history) => {
-  callcc((exit) => {
+export const back = (history, url) => {
+  return callcc((exit) => {
     traverse(history, (node, parents) => {
-      if (node.current) {
+      if (node.url === url) {
         const parent = last(parents);
 
         if (parent !== undefined) {
-          node.current = false;
-          parent.current = true;
+          exit(parent.url);
         }
 
         exit();
@@ -71,13 +58,12 @@ export const back = (history) => {
   });
 };
 
-export const forward = (history) => {
-  callcc((exit) => {
+export const forward = (history, url) => {
+  return callcc((exit) => {
     traverse(history, (node) => {
-      if (node.current) {
+      if (node.url === url) {
         if (node.children.length > 0) {
-          node.current = false;
-          last(node.children).current = true;
+          exit(last(node.children).url);
         }
 
         exit();
@@ -86,33 +72,23 @@ export const forward = (history) => {
   });
 };
 
-export const getCurrent = (history) => {
+export const get = (history, url) => {
   return callcc((exit) => {
     traverse(history, (node, parents) => {
-      if (node.current) {
+      if (node.url === url) {
         exit({ node, parents });
       }
     });
   });
 };
 
-export const processCurrent = (history, callback) => {
+export const process = (history, url, callback) => {
   callcc((exit) => {
     traverse(history, (node, parents) => {
-      if (node.current) {
+      if (node.url === url) {
         callback(node, parents);
         exit();
       }
     });
   });
 };
-
-export const create = url => {
-  return {
-    url,
-    title: '',
-    current: true,
-    children: [],
-    timestamp: Date.now()
-  }
-}

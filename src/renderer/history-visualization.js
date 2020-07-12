@@ -5,7 +5,7 @@ import { traverse } from "./utils";
 
 const [W, H] = [16, 16];
 
-export default ({ history, onClick }) => {
+export default ({ history, panes, onClick }) => {
   const { items, verticalLines, horizontalLines } = useMemo(() => {
     let items = [];
 
@@ -86,57 +86,53 @@ export default ({ history, onClick }) => {
   const maxY = items.length;
 
   return (
-    <div className="scroll" style={{ maxHeight: 260 }}>
-      <svg width={600} height={maxY * H} className="pa2">
-        <g transform="translate(2, 6)">
-          {verticalLines.map(({ start, end, offset }, i) => (
-            <line
+    <svg width={1280} height={maxY * H} className="pa2">
+      <g transform="translate(2, 6)">
+        {verticalLines.map(({ start, end, offset }, i) => (
+          <line
+            key={i}
+            x1={offset * W}
+            y1={start * H}
+            x2={offset * W}
+            y2={end * H}
+            stroke="#777"
+          />
+        ))}
+
+        {horizontalLines.map(({ start, end, offset }, i) => (
+          <line
+            key={i}
+            x1={start * W}
+            y1={offset * H}
+            x2={end * W}
+            y2={offset * H}
+            stroke="#777"
+          />
+        ))}
+
+        {items.map((item, i) => {
+          const { data, gx, gy } = item;
+          const isActive = panes.includes(data.url);
+          const fill = isActive ? "#ddd" : "#777";
+
+          return (
+            <g
               key={i}
-              x1={offset * W}
-              y1={start * H}
-              x2={offset * W}
-              y2={end * H}
-              stroke="#777"
-            />
-          ))}
-
-          {horizontalLines.map(({ start, end, offset }, i) => (
-            <line
-              key={i}
-              x1={start * W}
-              y1={offset * H}
-              x2={end * W}
-              y2={offset * H}
-              stroke="#777"
-            />
-          ))}
-
-          {items.map((item, i) => {
-            const { data, gx, gy } = item;
-            const fill = data.current ? "#ddd" : "#777";
-
-            return (
-              <g
-                key={i}
-                className="dim pointer"
-                transform={`translate(0, ${gy * W})`}
-                onClick={() => {
-                  const path = item.parents
-                    .map((p) => p.url)
-                    .concat([data.url]);
-
-                  onClick(path);
-                }}
-              >
-                <circle cx={gx * W} cy={0} r={2} fill={fill} />
-                <text x={maxX * W} y={5} fill={fill} fontSize={14}>
-                  {data.title || data.url}
-                </text>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
-    </div>
+              className="dim pointer"
+              transform={`translate(0, ${gy * W})`}
+              onClick={() => {
+                const path = item.parents.map((p) => p.url).concat([data.url]);
+                onClick(path);
+              }}
+            >
+              <circle cx={gx * W} cy={0} r={2} fill={fill} />
+              <text x={maxX * W} y={5} fill={fill} fontSize={14}>
+                {data.title ? `${data.title} — ${data.url}` : data.url}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    </svg>
   );
 };

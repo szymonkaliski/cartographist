@@ -1,13 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import path from "path";
 
-import History from "./history-visualization";
-
 const INJECT_PATH = path.join(process.cwd(), __dirname, "inject.js");
 
 export default ({
   src,
-  history,
   title,
   width,
 
@@ -16,8 +13,6 @@ export default ({
   onGoBack,
   onGoForward,
 
-  onNavigateHistory,
-
   onSetTitle,
   onNewWindow,
   onClose,
@@ -25,8 +20,6 @@ export default ({
   onFullscreen,
 }) => {
   const [hoverUrl, setHoverUrl] = useState(null);
-  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-
   const ref = useRef(null);
 
   useEffect(() => {
@@ -67,8 +60,6 @@ export default ({
     });
   }, [ref]);
 
-  const canShowHistory = canGoForward || canGoBack;
-
   return (
     <div className="flex flex-column h-100" style={{ width }}>
       <div className="pa2 sans-serif f6 light-gray flex items-center justify-between bg-dark-gray">
@@ -90,15 +81,6 @@ export default ({
             onClick={onGoForward}
           >
             →
-          </button>
-          <button
-            className={`bg-dark-gray bw0 pointer dim ${
-              canShowHistory ? "light-gray" : "gray"
-            }`}
-            disabled={!canShowHistory}
-            onClick={() => setIsHistoryVisible(!isHistoryVisible)}
-          >
-            ◯
           </button>
 
           <div title={src} className="flex ml2">
@@ -132,15 +114,6 @@ export default ({
       </div>
 
       <div className="h-100 relative">
-        {isHistoryVisible && (
-          <div
-            className="absolute bg-dark-gray light-gray w-100 pa2 overflow-scroll"
-            style={{ top: 0 }}
-          >
-            <History history={history} onClick={onNavigateHistory} />
-          </div>
-        )}
-
         <webview
           ref={ref}
           src={src}

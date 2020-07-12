@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import produce from "immer";
 
-export default function usePersistedState(key, initialValue) {
+export default function usePersistedImmer(persistenceKey, initialValue) {
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
     if (value === initialValue) {
-      const stored = localStorage[key];
+      const stored = localStorage[persistenceKey];
 
       if (stored) {
         let storedValue;
@@ -20,7 +20,7 @@ export default function usePersistedState(key, initialValue) {
         }
       }
     } else {
-      localStorage[key] = JSON.stringify(value);
+      localStorage[persistenceKey] = JSON.stringify(value);
     }
   }, [value, setValue]);
 
