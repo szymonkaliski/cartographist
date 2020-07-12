@@ -11,7 +11,9 @@ import usePersistedState from "./use-persisted-state";
 const PANE_WIDTH = 640;
 
 const INITIAL_STATE = [
-  h.create("https://en.m.wikipedia.org/wiki/Double-loop_learning"),
+  // h.create("https://en.m.wikipedia.org/wiki/Double-loop_learning"),
+  // h.create("https://notes.andymatuschak.org"),
+  h.create("https://szymonkaliski.com"),
 ];
 
 const App = () => {
@@ -43,7 +45,7 @@ const App = () => {
           const isFullscreen = i === fullscreenIdx;
           const width = isFullscreen ? "100%" : PANE_WIDTH; // TODO: width in px?
 
-          const className = `ba b--dark-gray bg-dark-gray ${
+          const className = `ba b--dark-gray bg-white ${
             isFullscreen && "absolute w-100 z-3"
           }`;
 

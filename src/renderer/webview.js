@@ -71,7 +71,7 @@ export default ({
 
   return (
     <div className="flex flex-column h-100" style={{ width }}>
-      <div className="pa2 sans-serif f6 light-gray flex items-center justify-between">
+      <div className="pa2 sans-serif f6 light-gray flex items-center justify-between bg-dark-gray">
         <div className="flex truncate">
           <button
             className={`bg-dark-gray bw0 pointer dim ${
