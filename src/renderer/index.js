@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import normalizeUrl from "normalize-url";
 import { last } from "lodash";
@@ -14,34 +14,50 @@ import usePersistedImmer from "./use-persisted-immer";
 const PANE_WIDTH = 640;
 const HISTORY_WIDTH = 420;
 
-const START_URL = normalizeUrl("https://szymonkaliski.com");
-// https://en.m.wikipedia.org/wiki/Double-loop_learning"
-// https://notes.andymatuschak.org"
+const NEW_URL = normalizeUrl("https://google.com");
 
 const INITIAL_STATE = {
-  history: h.create(START_URL),
-  panes: [START_URL],
+  history: h.create(NEW_URL),
+  panes: [NEW_URL],
   fullscreenId: null,
 };
 
 const App = () => {
   const [state, setState] = usePersistedImmer("state", INITIAL_STATE);
 
-  window.reset = () => {
-    setState((draft) => {
-      Object.entries(INITIAL_STATE).forEach(([key, value]) => {
-        draft[key] = value;
+  // debugging tools
+  useEffect(() => {
+    window.reset = () => {
+      setState((draft) => {
+        Object.entries(INITIAL_STATE).forEach(([key, value]) => {
+          draft[key] = value;
+        });
       });
-    });
-  };
+    };
 
-  window.state = state;
+    window.state = state;
+  }, [state]);
 
   return (
     <div className="sans-serif bg-near-white vh-100 flex flex-column">
       <div className="flex h-100">
         <div className="flex flex-column bg-dark-gray">
-          <div style={{ WebkitAppRegion: "drag", height: 38 }} />
+          <div style={{ WebkitAppRegion: "drag", height: 38 }}>
+            <div className="fr pa1">
+              <button
+                className="bg-dark-gray light-gray bw0 pointer dim f4"
+                title="Fullscreen"
+                onClick={() => {
+                  setState((draft) => {
+                    h.navigate(draft.history, draft.history.url, NEW_URL);
+                    draft.panes.push(normalizeUrl(NEW_URL));
+                  });
+                }}
+              >
+                +
+              </button>
+            </div>
+          </div>
 
           <div
             className="h-100 overflow-scroll"
@@ -52,7 +68,14 @@ const App = () => {
               panes={state.panes}
               onClick={(path) => {
                 setState((draft) => {
-                  draft.panes.push(last(path));
+                  const targetUrl = last(path);
+
+                  // don't create duplicate panes
+                  if (draft.panes.some((pane) => pane === targetUrl)) {
+                    return;
+                  }
+
+                  draft.panes.push(targetUrl);
                 });
               }}
             />
