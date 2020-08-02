@@ -29,6 +29,10 @@ export default ({
 
   useEffect(() => {
     setTmpSrc(src);
+
+    if (ref.current) {
+      ref.current.scrollIntoView();
+    }
   }, [src]);
 
   useEffect(() => {
