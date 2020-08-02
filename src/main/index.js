@@ -17,7 +17,7 @@ const createWindow = () => {
   });
 
   if (IS_DEV) {
-    window.webContents.openDevTools();
+    // window.webContents.openDevTools();
     window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
   } else {
     window.loadURL(
