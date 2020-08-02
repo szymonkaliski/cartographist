@@ -1,6 +1,8 @@
 const path = require("path");
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, Menu } = require("electron");
 const { format } = require("url");
+
+const buildMenu = require("./menu");
 
 const IS_DEV = process.env.NODE_ENV !== "production";
 
@@ -50,4 +52,5 @@ app.on("activate", () => {
 
 app.on("ready", () => {
   mainWindow = createWindow();
+  Menu.setApplicationMenu(buildMenu(mainWindow));
 });

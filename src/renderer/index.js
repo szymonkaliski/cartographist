@@ -1,6 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import fs from "fs";
+import md5 from "md5";
 import normalizeUrl from "normalize-url";
+import { ipcRenderer, remote } from "electron";
 import { last } from "lodash";
 
 import "tachyons/src/tachyons.css";
@@ -16,27 +19,116 @@ const HISTORY_WIDTH = 420;
 
 const NEW_URL = normalizeUrl("https://google.com");
 
-const INITIAL_STATE = {
-  history: h.create(NEW_URL),
-  panes: [NEW_URL],
-  fullscreenId: null,
+const createEmptyState = () => {
+  return {
+    history: h.create(NEW_URL),
+    panes: [NEW_URL],
+    fullscreenId: null,
+  };
 };
 
 const App = () => {
-  const [state, setState] = usePersistedImmer("state", INITIAL_STATE);
+  const [state, setState] = usePersistedImmer("state", createEmptyState());
+  const [lastStoreHash, setLastStoreHash] = useState(null);
+
+  const replaceStateFromObject = (obj) => {
+    setState((draft) => {
+      Object.entries(obj).forEach(([key, value]) => {
+        draft[key] = value;
+      });
+    });
+  };
+
+  const resetToInitialState = () => replaceStateFromObject(createEmptyState());
 
   // debugging tools
   useEffect(() => {
-    window.reset = () => {
-      setState((draft) => {
-        Object.entries(INITIAL_STATE).forEach(([key, value]) => {
-          draft[key] = value;
-        });
-      });
-    };
-
+    window.reset = resetToInitialState;
     window.state = state;
-  }, [state]);
+  }, [state, setState]);
+
+  const onNewPane = () => {
+    setState((draft) => {
+      h.navigate(draft.history, draft.history.url, NEW_URL);
+      draft.panes.push(normalizeUrl(NEW_URL));
+    });
+  };
+
+  useEffect(() => {
+    ipcRenderer.on("NEW_PANE", () => {
+      onNewPane();
+    });
+
+    ipcRenderer.on("NEW_TRAIL", () => {
+      const currentHash = md5(JSON.stringify(state));
+
+      if (currentHash !== lastStoreHash) {
+        const result = remote.dialog.showMessageBoxSync({
+          type: "warning",
+          message:
+            "Current trail has unsaved changes, creating a new one will loose them. Do you want to proceed?",
+          buttons: ["Yes", "No"],
+        });
+
+        const chosenNo = result === 1;
+
+        if (chosenNo) {
+          return;
+        }
+      }
+
+      resetToInitialState();
+    });
+
+    ipcRenderer.on("SAVE_TRAIL", () => {
+      const savePath = remote.dialog.showSaveDialogSync({
+        title: "Save Trail",
+        defaultPath: "research.trail",
+      });
+
+      if (!savePath) {
+        return;
+      }
+
+      const stringified = JSON.stringify(state);
+
+      setLastStoreHash(md5(stringified));
+      fs.writeFileSync(savePath, stringified);
+    });
+
+    ipcRenderer.on("LOAD_TRAIL", () => {
+      let loadPath = remote.dialog.showOpenDialogSync({
+        filters: [{ name: "Trails", extensions: "trail" }],
+      });
+
+      if (!loadPath || loadPath.length === 0) {
+        return;
+      }
+
+      loadPath = loadPath[0];
+
+      let data, parsed;
+
+      try {
+        data = fs.readFileSync(loadPath);
+        parsed = JSON.parse(data);
+      } catch (e) {
+        alert(e.toString());
+      }
+
+      if (data && parsed) {
+        setLastStoreHash(md5(data));
+        replaceStateFromObject(parsed);
+      }
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners("NEW_PANE");
+      ipcRenderer.removeAllListeners("NEW_TRAIL");
+      ipcRenderer.removeAllListeners("SAVE_TRAIL");
+      ipcRenderer.removeAllListeners("LOAD_TRAIL");
+    };
+  }, [state, onNewPane, lastStoreHash, setLastStoreHash]);
 
   return (
     <div className="sans-serif bg-near-white vh-100 flex flex-column">
@@ -47,12 +139,7 @@ const App = () => {
               <button
                 className="bg-dark-gray light-gray bw0 pointer dim f4"
                 title="Fullscreen"
-                onClick={() => {
-                  setState((draft) => {
-                    h.navigate(draft.history, draft.history.url, NEW_URL);
-                    draft.panes.push(normalizeUrl(NEW_URL));
-                  });
-                }}
+                onClick={onNewPane}
               >
                 +
               </button>
