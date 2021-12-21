@@ -83,7 +83,7 @@ const App = () => {
     ipcRenderer.on("SAVE_TRAIL", () => {
       const savePath = remote.dialog.showSaveDialogSync({
         title: "Save Trail",
-        defaultPath: "research.trail",
+        defaultPath: "cartographist.trail",
       });
 
       if (!savePath) {

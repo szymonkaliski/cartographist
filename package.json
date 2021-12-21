@@ -1,5 +1,5 @@
 {
-  "name": "research-browser",
+  "name": "cartographist",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,7 @@
   "author": "Szymon Kaliski <hi@szymonkaliski.com> (http://szymonkaliski.com)",
   "license": "MIT",
   "electronWebpack": {
-    "title": "Research Browser",
+    "title": "Cartographist",
     "whiteListedModules": []
   },
   "devDependencies": {
