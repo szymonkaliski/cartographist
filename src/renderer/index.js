@@ -17,7 +17,7 @@ import usePersistedImmer from "./use-persisted-immer";
 const PANE_WIDTH = 640;
 const HISTORY_WIDTH = 420;
 
-const NEW_URL = normalizeUrl("https://google.com");
+const NEW_URL = normalizeUrl("https://duckduckgo.com");
 
 const createEmptyState = () => {
   return {
