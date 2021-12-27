@@ -4,9 +4,9 @@
 
 Cartographist is an experimental web browser optimized for rabbit-holing.
 
-- Instead of opening new windows (with `cmd`-click), Cartographist spawns horizontally-scrollable panes.
-- Instead of finding things in a linear history, Cartographist shows a tree-structured outline of your browsing.
-- Instead of always opening fresh, Cartographist can save, and load "trails" - the exact state of the session you've left - supporting researching topics over long periods of time.
+- Instead of opening new windows (with `cmd`-click), Cartographist spawns horizontally scrollable panes.
+- Instead of forcing you to find things in a linear history, Cartographist shows a tree-structured outline of your browsing.
+- Instead of always starting fresh, Cartographist can save, and load "trails" - the exact state of the session you've left - supporting researching topics over long periods of time.
 
 ## Running
 
